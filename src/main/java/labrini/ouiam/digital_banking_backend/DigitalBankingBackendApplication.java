@@ -3,6 +3,10 @@ package labrini.ouiam.digital_banking_backend;
 import labrini.ouiam.digital_banking_backend.Exception.BalanceNotSufficientException;
 import labrini.ouiam.digital_banking_backend.Exception.BankAccountNotFoundException;
 import labrini.ouiam.digital_banking_backend.Exception.CustomerNotFoundException;
+import labrini.ouiam.digital_banking_backend.dtos.BankAccountDTO;
+import labrini.ouiam.digital_banking_backend.dtos.CurrentBankAccountDTO;
+import labrini.ouiam.digital_banking_backend.dtos.CustomerDTO;
+import labrini.ouiam.digital_banking_backend.dtos.SavingBankAccountDTO;
 import labrini.ouiam.digital_banking_backend.entities.*;
 import labrini.ouiam.digital_banking_backend.enums.OperationType;
 import labrini.ouiam.digital_banking_backend.repositories.AccountOperationRepository;
@@ -31,7 +35,7 @@ public class DigitalBankingBackendApplication {
     CommandLineRunner commandLineRunner(BankAccountService bankAccountService) {
         return args -> {
             Stream.of("ouiam","Mohammed","ouissal").forEach(name -> {
-                Customer customer = new Customer();
+                CustomerDTO customer = new CustomerDTO();
                 customer.setName(name);
                 customer.setEmail(name + "@gmail.com");
                 bankAccountService.SaveCustomer(customer);
@@ -40,17 +44,23 @@ public class DigitalBankingBackendApplication {
                 try {
                     bankAccountService.saveCurrentBankAccount(Math.random() * 90000, 9000, cust.getId());
                     bankAccountService.saveSavingBankAccount(Math.random() * 90000, 5.5, cust.getId());
-                    List<BankAccount> bankAccounts= bankAccountService.bankAccountList();
-                    for (BankAccount bankAccount : bankAccounts) {
-                        for (int i = 0; i < 10; i++) {
-                            bankAccountService.Debit(bankAccount.getId(), 1000 + Math.random() * 1200, "Debit");
-                            bankAccountService.Credit(bankAccount.getId(), 1000 + Math.random() * 1200, "Credit");
-                        }
-                    }
-                } catch (CustomerNotFoundException | BankAccountNotFoundException | BalanceNotSufficientException e) {
+                } catch (CustomerNotFoundException e) {
                     e.printStackTrace();
                 }
             });
+            List<BankAccountDTO> bankAccounts= bankAccountService.bankAccountList();
+            for (BankAccountDTO bankAccount : bankAccounts) {
+                for (int i = 0; i < 10; i++) {
+                    String accountId;
+                    if (bankAccount instanceof SavingBankAccountDTO) {
+                        accountId = ((SavingBankAccountDTO) bankAccount).getId();
+                    } else {
+                        accountId = ((CurrentBankAccountDTO) bankAccount).getId();
+                    }
+                    bankAccountService.Debit(accountId, 1000 + Math.random() * 1200, "Debit");
+                    bankAccountService.Credit(accountId, 1000 + Math.random() * 1200, "Credit");
+                }
+            }
         };
     }
     //@Bean
