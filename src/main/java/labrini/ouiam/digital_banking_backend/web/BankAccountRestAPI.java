@@ -1,3 +1,47 @@
+//package labrini.ouiam.digital_banking_backend.web;
+//
+//import labrini.ouiam.digital_banking_backend.Exception.BankAccountNotFoundException;
+//import labrini.ouiam.digital_banking_backend.dtos.AccountHistoryDTO;
+//import labrini.ouiam.digital_banking_backend.dtos.AccountOperationDTO;
+//import labrini.ouiam.digital_banking_backend.dtos.BankAccountDTO;
+//import labrini.ouiam.digital_banking_backend.services.BankAccountService;
+//import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.PathVariable;
+//import org.springframework.web.bind.annotation.RequestParam;
+//import org.springframework.web.bind.annotation.RestController;
+//
+//import java.util.List;
+//
+//@RestController
+//public class BankAccountRestAPI {
+//    private BankAccountService bankAccountService;
+//
+//    public BankAccountRestAPI(BankAccountService bankAccountService) {
+//        this.bankAccountService = bankAccountService;
+//    }
+//
+//    @GetMapping("/accounts/{accountId}")
+//    public BankAccountDTO GetBankAccount(@PathVariable String accountId) throws BankAccountNotFoundException {
+//        return bankAccountService.getBankAccount(accountId);
+//    }
+//
+//    @GetMapping("/accounts")
+//    public List<BankAccountDTO> bankAccountList() {
+//        return bankAccountService.bankAccountList();
+//    }
+//
+//    @GetMapping("/accounts/{accountId}/operations")
+//    public List<AccountOperationDTO> AccountOperationsHistory(@PathVariable String accountId) throws BankAccountNotFoundException {
+//        return bankAccountService.AccountOperationsHistory(accountId);
+//    }
+//
+//    @GetMapping("/accounts/{accountId}/pageoperations")
+//    public AccountHistoryDTO getAccountHistory(@PathVariable String accountId,
+//                                               @RequestParam(name = "page",defaultValue ="0") int page,
+//                                               @RequestParam(name = "size",defaultValue ="5") int size) throws BankAccountNotFoundException {
+//        return bankAccountService.getAccountHistory(accountId,page,size);
+//    }
+//}
 package labrini.ouiam.digital_banking_backend.web;
 
 import labrini.ouiam.digital_banking_backend.Exception.BankAccountNotFoundException;
@@ -5,40 +49,41 @@ import labrini.ouiam.digital_banking_backend.dtos.AccountHistoryDTO;
 import labrini.ouiam.digital_banking_backend.dtos.AccountOperationDTO;
 import labrini.ouiam.digital_banking_backend.dtos.BankAccountDTO;
 import labrini.ouiam.digital_banking_backend.services.BankAccountService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+//@CrossOrigin(origins = "*")
 @RestController
+@Slf4j
+@RequestMapping("/accounts")
 public class BankAccountRestAPI {
-    private BankAccountService bankAccountService;
+    private final BankAccountService bankAccountService;
 
     public BankAccountRestAPI(BankAccountService bankAccountService) {
         this.bankAccountService = bankAccountService;
     }
 
-    @GetMapping("/accounts/{accountId}")
-    public BankAccountDTO GetBankAccount(@PathVariable String accountId) throws BankAccountNotFoundException {
+    @GetMapping("/{accountId}")
+    public BankAccountDTO getBankAccount(@PathVariable String accountId) throws BankAccountNotFoundException {
         return bankAccountService.getBankAccount(accountId);
     }
 
-    @GetMapping("/accounts")
+    @GetMapping
     public List<BankAccountDTO> bankAccountList() {
         return bankAccountService.bankAccountList();
     }
 
-    @GetMapping("/accounts/{accountId}/operations")
-    public List<AccountOperationDTO> AccountOperationsHistory(@PathVariable String accountId) throws BankAccountNotFoundException {
+    @GetMapping("/{accountId}/operations")
+    public List<AccountOperationDTO> accountOperationsHistory(@PathVariable String accountId) {
         return bankAccountService.AccountOperationsHistory(accountId);
     }
 
-    @GetMapping("/accounts/{accountId}/pageoperations")
+    @GetMapping("/{accountId}/pageoperations")
     public AccountHistoryDTO getAccountHistory(@PathVariable String accountId,
-                                               @RequestParam(name = "page",defaultValue ="0") int page,
-                                               @RequestParam(name = "size",defaultValue ="5") int size) throws BankAccountNotFoundException {
-        return bankAccountService.getAccountHistory(accountId,page,size);
+                                               @RequestParam(name = "page", defaultValue = "0") int page,
+                                               @RequestParam(name = "size", defaultValue = "5") int size) throws BankAccountNotFoundException {
+        return bankAccountService.getAccountHistory(accountId, page, size);
     }
 }

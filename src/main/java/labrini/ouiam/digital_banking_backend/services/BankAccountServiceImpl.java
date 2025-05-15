@@ -188,4 +188,9 @@ public class BankAccountServiceImpl implements BankAccountService {
         accountHistoryDTO.setPageSize(size);
         return accountHistoryDTO;
     }
+    @Override
+    public List<CustomerDTO> searchCustemers(String keyword) {
+        List<Customer> customers = customerRepository.searchCustomer(keyword);
+        return customers.stream().map(cust -> bankAccountMapper.FromCustomer(cust)).collect(Collectors.toList());
+    }
 }
