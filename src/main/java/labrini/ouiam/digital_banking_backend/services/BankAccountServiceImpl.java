@@ -186,6 +186,7 @@ public class BankAccountServiceImpl implements BankAccountService {
         accountHistoryDTO.setTotalPages(operations.getTotalPages());
         accountHistoryDTO.setCurrentPage(page);
         accountHistoryDTO.setPageSize(size);
+        accountHistoryDTO.setAccountOperationDTO(operationDTOS);
         return accountHistoryDTO;
     }
     @Override

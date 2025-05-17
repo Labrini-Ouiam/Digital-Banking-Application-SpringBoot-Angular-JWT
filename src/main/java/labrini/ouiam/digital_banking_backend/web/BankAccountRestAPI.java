@@ -44,17 +44,16 @@
 //}
 package labrini.ouiam.digital_banking_backend.web;
 
+import labrini.ouiam.digital_banking_backend.Exception.BalanceNotSufficientException;
 import labrini.ouiam.digital_banking_backend.Exception.BankAccountNotFoundException;
-import labrini.ouiam.digital_banking_backend.dtos.AccountHistoryDTO;
-import labrini.ouiam.digital_banking_backend.dtos.AccountOperationDTO;
-import labrini.ouiam.digital_banking_backend.dtos.BankAccountDTO;
+import labrini.ouiam.digital_banking_backend.dtos.*;
 import labrini.ouiam.digital_banking_backend.services.BankAccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*")
 @RestController
 @Slf4j
 @RequestMapping("/accounts")
@@ -85,5 +84,23 @@ public class BankAccountRestAPI {
                                                @RequestParam(name = "page", defaultValue = "0") int page,
                                                @RequestParam(name = "size", defaultValue = "5") int size) throws BankAccountNotFoundException {
         return bankAccountService.getAccountHistory(accountId, page, size);
+    }
+
+    @PostMapping("/debit")
+    public DebitDTO debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        this.bankAccountService.Debit(debitDTO.getAccountId(), debitDTO.getAmount(), debitDTO.getDescription());
+        return debitDTO;
+    }
+
+    @PostMapping("/credit")
+    public CreditDTO credit(@RequestBody CreditDTO creditDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        this.bankAccountService.Credit(creditDTO.getAccountId(), creditDTO.getAmount(), creditDTO.getDescription());
+        return creditDTO;
+    }
+    @PostMapping("/transfer")
+    public void transfer(@RequestBody TransfertRequestDTO transfertRequestDTO){
+        this.bankAccountService.Transfer(transfertRequestDTO.getAccountSource(),
+                transfertRequestDTO.getAccountDestination(),
+                transfertRequestDTO.getAmount());
     }
 }
