@@ -4,10 +4,6 @@ import labrini.ouiam.digital_banking_backend.Exception.BalanceNotSufficientExcep
 import labrini.ouiam.digital_banking_backend.Exception.BankAccountNotFoundException;
 import labrini.ouiam.digital_banking_backend.Exception.CustomerNotFoundException;
 import labrini.ouiam.digital_banking_backend.dtos.*;
-import labrini.ouiam.digital_banking_backend.entities.BankAccount;
-import labrini.ouiam.digital_banking_backend.entities.CurrentAccount;
-import labrini.ouiam.digital_banking_backend.entities.Customer;
-import labrini.ouiam.digital_banking_backend.entities.SavingAccount;
 
 import java.util.List;
 

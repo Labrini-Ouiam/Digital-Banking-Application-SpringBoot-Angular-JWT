@@ -1,92 +1,49 @@
-//package labrini.ouiam.digital_banking_backend.web;
-//
-//import labrini.ouiam.digital_banking_backend.Exception.CustomerNotFoundException;
-//import labrini.ouiam.digital_banking_backend.dtos.CustomerDTO;
-//import labrini.ouiam.digital_banking_backend.entities.BankAccount;
-//import labrini.ouiam.digital_banking_backend.entities.Customer;
-//import labrini.ouiam.digital_banking_backend.services.BankAccountService;
-//import org.springframework.web.bind.annotation.*;
-//
-//import java.util.List;
-//
-//@RestController
-//
-//public class CustomerRestController {
-//    private BankAccountService bankAccountService;
-//
-//    @GetMapping("/customers")
-//    public List<CustomerDTO> customers() {
-//        return bankAccountService.listCustomers();
-//    }
-//
-//    @GetMapping("/customers/{id}")
-//    public CustomerDTO getCustomer(@PathVariable Long id) throws CustomerNotFoundException {
-//        return bankAccountService.getCustomerDTOById(id);
-//    }
-//
-//    @PostMapping("/customers")
-//    public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO) {
-//        return bankAccountService.SaveCustomer(customerDTO);
-//    }
-//
-//    @PutMapping("/customers/{id}")
-//    public CustomerDTO updateCustomer(@PathVariable Long id,@RequestBody CustomerDTO customerDTO) throws CustomerNotFoundException {
-//        customerDTO.setId(id);
-//        return bankAccountService.UpdateCustomer(customerDTO);
-//    }
-//
-//    @DeleteMapping("/customers/{id}")
-//    public void deleteCustomer(@PathVariable Long id) throws CustomerNotFoundException {
-//        bankAccountService.deleteCustomer(id);
-//    }
-//}
 package labrini.ouiam.digital_banking_backend.web;
 
 import labrini.ouiam.digital_banking_backend.Exception.CustomerNotFoundException;
 import labrini.ouiam.digital_banking_backend.dtos.CustomerDTO;
 import labrini.ouiam.digital_banking_backend.services.BankAccountService;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@AllArgsConstructor
 @Slf4j
-//@CrossOrigin(origins = "*")
-@RequestMapping("/customers")
+@CrossOrigin("*")
 public class CustomerRestController {
-    private final BankAccountService bankAccountService;
-
-    public CustomerRestController(BankAccountService bankAccountService) {
-        this.bankAccountService = bankAccountService;
-    }
-
-    @GetMapping
-    public List<CustomerDTO> customers() {
+    private BankAccountService bankAccountService;
+    @GetMapping("/customers")
+    @PreAuthorize("hasAuthority('SCOPE_USER')")
+    public List<CustomerDTO> customers(){
         return bankAccountService.listCustomers();
     }
-    @GetMapping("/search")
-    public List<CustomerDTO> SearchCustomers(@RequestParam(name="keyword",defaultValue = "")String keyword) {
+    @GetMapping("/customers/search")
+    @PreAuthorize("hasAuthority('SCOPE_USER')")
+    public List<CustomerDTO> searchCustomers(@RequestParam(name = "keyword",defaultValue = "") String keyword){
         return bankAccountService.searchCustemers("%"+keyword+"%");
     }
-
-    @GetMapping("/{id}")
-    public CustomerDTO getCustomer(@PathVariable Long id) throws CustomerNotFoundException {
-        return bankAccountService.getCustomerDTOById(id);
+    @GetMapping("/customers/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_USER')")
+    public CustomerDTO getCustomer(@PathVariable(name = "id") Long customerId) throws CustomerNotFoundException {
+        return bankAccountService.getCustomerDTOById(customerId);
     }
-
-    @PostMapping
-    public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO) {
+    @PostMapping("/customers")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
         return bankAccountService.SaveCustomer(customerDTO);
     }
-
-    @PutMapping("/{id}")
-    public CustomerDTO updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) throws CustomerNotFoundException {
-        customerDTO.setId(id);
+    @PutMapping("/customers/{customerId}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public CustomerDTO updateCustomer(@PathVariable Long customerId, @RequestBody CustomerDTO customerDTO){
+        customerDTO.setId(customerId);
         return bankAccountService.UpdateCustomer(customerDTO);
     }
-
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/customers/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public void deleteCustomer(@PathVariable Long id) throws CustomerNotFoundException {
         bankAccountService.deleteCustomer(id);
     }

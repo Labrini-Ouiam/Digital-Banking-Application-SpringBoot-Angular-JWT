@@ -1,106 +1,57 @@
-//package labrini.ouiam.digital_banking_backend.web;
-//
-//import labrini.ouiam.digital_banking_backend.Exception.BankAccountNotFoundException;
-//import labrini.ouiam.digital_banking_backend.dtos.AccountHistoryDTO;
-//import labrini.ouiam.digital_banking_backend.dtos.AccountOperationDTO;
-//import labrini.ouiam.digital_banking_backend.dtos.BankAccountDTO;
-//import labrini.ouiam.digital_banking_backend.services.BankAccountService;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.RequestParam;
-//import org.springframework.web.bind.annotation.RestController;
-//
-//import java.util.List;
-//
-//@RestController
-//public class BankAccountRestAPI {
-//    private BankAccountService bankAccountService;
-//
-//    public BankAccountRestAPI(BankAccountService bankAccountService) {
-//        this.bankAccountService = bankAccountService;
-//    }
-//
-//    @GetMapping("/accounts/{accountId}")
-//    public BankAccountDTO GetBankAccount(@PathVariable String accountId) throws BankAccountNotFoundException {
-//        return bankAccountService.getBankAccount(accountId);
-//    }
-//
-//    @GetMapping("/accounts")
-//    public List<BankAccountDTO> bankAccountList() {
-//        return bankAccountService.bankAccountList();
-//    }
-//
-//    @GetMapping("/accounts/{accountId}/operations")
-//    public List<AccountOperationDTO> AccountOperationsHistory(@PathVariable String accountId) throws BankAccountNotFoundException {
-//        return bankAccountService.AccountOperationsHistory(accountId);
-//    }
-//
-//    @GetMapping("/accounts/{accountId}/pageoperations")
-//    public AccountHistoryDTO getAccountHistory(@PathVariable String accountId,
-//                                               @RequestParam(name = "page",defaultValue ="0") int page,
-//                                               @RequestParam(name = "size",defaultValue ="5") int size) throws BankAccountNotFoundException {
-//        return bankAccountService.getAccountHistory(accountId,page,size);
-//    }
-//}
 package labrini.ouiam.digital_banking_backend.web;
 
 import labrini.ouiam.digital_banking_backend.Exception.BalanceNotSufficientException;
 import labrini.ouiam.digital_banking_backend.Exception.BankAccountNotFoundException;
 import labrini.ouiam.digital_banking_backend.dtos.*;
 import labrini.ouiam.digital_banking_backend.services.BankAccountService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*")
 @RestController
-@Slf4j
-@RequestMapping("/accounts")
+@CrossOrigin("*")
 public class BankAccountRestAPI {
-    private final BankAccountService bankAccountService;
+    private BankAccountService bankAccountService;
 
     public BankAccountRestAPI(BankAccountService bankAccountService) {
         this.bankAccountService = bankAccountService;
     }
 
-    @GetMapping("/{accountId}")
+    @GetMapping("/accounts/{accountId}")
     public BankAccountDTO getBankAccount(@PathVariable String accountId) throws BankAccountNotFoundException {
         return bankAccountService.getBankAccount(accountId);
     }
-
-    @GetMapping
-    public List<BankAccountDTO> bankAccountList() {
+    @GetMapping("/accounts")
+    public List<BankAccountDTO> listAccounts(){
         return bankAccountService.bankAccountList();
     }
-
-    @GetMapping("/{accountId}/operations")
-    public List<AccountOperationDTO> accountOperationsHistory(@PathVariable String accountId) {
+    @GetMapping("/accounts/{accountId}/operations")
+    public List<AccountOperationDTO> getHistory(@PathVariable String accountId){
         return bankAccountService.AccountOperationsHistory(accountId);
     }
 
-    @GetMapping("/{accountId}/pageoperations")
-    public AccountHistoryDTO getAccountHistory(@PathVariable String accountId,
-                                               @RequestParam(name = "page", defaultValue = "0") int page,
-                                               @RequestParam(name = "size", defaultValue = "5") int size) throws BankAccountNotFoundException {
-        return bankAccountService.getAccountHistory(accountId, page, size);
+    @GetMapping("/accounts/{accountId}/pageOperations")
+    public AccountHistoryDTO getAccountHistory(
+            @PathVariable String accountId,
+            @RequestParam(name="page",defaultValue = "0") int page,
+            @RequestParam(name="size",defaultValue = "5")int size) throws BankAccountNotFoundException {
+        return bankAccountService.getAccountHistory(accountId,page,size);
     }
-
-    @PostMapping("/debit")
+    @PostMapping("/accounts/debit")
     public DebitDTO debit(@RequestBody DebitDTO debitDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
-        this.bankAccountService.Debit(debitDTO.getAccountId(), debitDTO.getAmount(), debitDTO.getDescription());
+        this.bankAccountService.Debit(debitDTO.getAccountId(),debitDTO.getAmount(),debitDTO.getDescription());
         return debitDTO;
     }
-
-    @PostMapping("/credit")
-    public CreditDTO credit(@RequestBody CreditDTO creditDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
-        this.bankAccountService.Credit(creditDTO.getAccountId(), creditDTO.getAmount(), creditDTO.getDescription());
+    @PostMapping("/accounts/credit")
+    public CreditDTO credit(@RequestBody CreditDTO creditDTO) throws BankAccountNotFoundException {
+        this.bankAccountService.Credit(creditDTO.getAccountId(),creditDTO.getAmount(),creditDTO.getDescription());
         return creditDTO;
     }
-    @PostMapping("/transfer")
-    public void transfer(@RequestBody TransfertRequestDTO transfertRequestDTO){
-        this.bankAccountService.Transfer(transfertRequestDTO.getAccountSource(),
-                transfertRequestDTO.getAccountDestination(),
-                transfertRequestDTO.getAmount());
+    @PostMapping("/accounts/transfer")
+    public void transfer(@RequestBody TransfertRequestDTO transferRequestDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
+        this.bankAccountService.Transfer(
+                transferRequestDTO.getAccountSource(),
+                transferRequestDTO.getAccountDestination(),
+                transferRequestDTO.getAmount());
     }
 }
